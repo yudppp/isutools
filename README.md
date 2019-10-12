@@ -9,6 +9,10 @@
 
 pprofの結果をSlackに送る
 
+### tracereporter
+
+datadogのAPMの結果を出力するやつ
+
 
 ### utils/throttle
 
@@ -22,7 +26,6 @@ Slackcat wrapper
 ## TODO tools
 
 - access logger
-- sql profiler
 - slack log writter
 
 ## Setup

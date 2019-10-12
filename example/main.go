@@ -17,7 +17,7 @@ func main() {
 var printThrottle = throttle.New(time.Second * 1)
 
 func loopGcd() {
-	size := int64(5000)
+	size := int64(4000)
 	for a := int64(0); a < size; a++ {
 		for b := a; b < size; b++ {
 			// logging per time
