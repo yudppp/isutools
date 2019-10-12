@@ -39,7 +39,7 @@ slackcat --configure
 
 ```
 go get github.com/najeira/measure
-go get github.com/tenntenn/isucontools
+go get github.com/tenntenn/isucontools/...
 cat main.go | sqlstr 
 ```
 
@@ -47,7 +47,7 @@ cat main.go | sqlstr
 
 ```
 go get github.com/tenntenn/isucontools
-cat main.go | mesuregen > main.go
+cat main.go | go run $GOPATH/src/github.com/tenntenn/isucontools/cmd/measuregen/measuregen.go | pbcopy
 ```
 
 ## dependency
