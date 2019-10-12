@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/rcrowley/go-metrics"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 	"github.com/yudppp/isutools/utils/measurereporter"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 
 	"github.com/najeira/measure"
 )
 
 // Start .
-func Start(duration time.Duration, serviceName,sortKey string, getKey func(span mocktracer.Span) string) {
+func Start(duration time.Duration, serviceName, sortKey string, getKey func(span mocktracer.Span) string) {
 	mt := mocktracer.Start()
 	go func() {
 		time.Sleep(duration)
@@ -53,7 +53,7 @@ func Start(duration time.Duration, serviceName,sortKey string, getKey func(span 
 			sortKey = "Sum"
 		}
 		result.SortDesc(sortKey)
-		measurereporter.Send(fmt.Sprintf("%s.txt", serviceName),result )
+		measurereporter.Send(fmt.Sprintf("%s.csv", serviceName), result)
 		mt.Stop()
 	}()
 }
