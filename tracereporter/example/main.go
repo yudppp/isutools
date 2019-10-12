@@ -1,22 +1,21 @@
 package main
 
-
 import (
-	"time"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
+	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/yudppp/isutools/tracereporter"
 	sqltrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/database/sql"
 	"gopkg.in/DataDog/dd-trace-go.v1/contrib/jmoiron/sqlx"
-	"github.com/go-sql-driver/mysql"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 )
 
 func main() {
-	tracereporter.Start(time.Second * 3, "", func(span mocktracer.Span) string {
+	tracereporter.Start(time.Second*3, "mysql", "", func(span mocktracer.Span) string {
 		tags := span.Tags()
 		resoureName, ok := tags["resource.name"]
 		if !ok {

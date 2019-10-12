@@ -6,17 +6,24 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
+	"github.com/yudppp/isutools/utils/measurereporter"
+
 	"github.com/najeira/measure"
 )
 
 // Start .
-func Start(duration time.Duration, sortKey string, getKey func(span mocktracer.Span) string) {
+func Start(duration time.Duration, serviceName,sortKey string, getKey func(span mocktracer.Span) string) {
 	mt := mocktracer.Start()
 	go func() {
 		time.Sleep(duration)
 		spans := mt.FinishedSpans()
 		metricsMap := make(map[string]metrics.Timer)
 		for _, span := range spans {
+			tags := span.Tags()
+			spanServiceName, ok := tags["service.name"]
+			if ok && serviceName != "" && spanServiceName != spanServiceName {
+				continue
+			}
 			key := getKey(span)
 			if key == "" {
 				continue
@@ -46,10 +53,7 @@ func Start(duration time.Duration, sortKey string, getKey func(span mocktracer.S
 			sortKey = "Sum"
 		}
 		result.SortDesc(sortKey)
-		fmt.Println("Key, Count, Sum, Min, Sum, Max, Avg, Rate, P95")
-		for _, row := range result {
-			fmt.Println(row.Key, row.Count, row.Sum, row.Min, row.Sum, row.Max, row.Avg, row.Rate, row.P95)
-		}
+		measurereporter.Send(fmt.Sprintf("%s.txt", serviceName),result )
 		mt.Stop()
 	}()
 }
