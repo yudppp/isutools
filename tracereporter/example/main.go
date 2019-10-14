@@ -11,19 +11,10 @@ import (
 	"github.com/yudppp/isutools/tracereporter"
 	sqltrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/database/sql"
 	"gopkg.in/DataDog/dd-trace-go.v1/contrib/jmoiron/sqlx"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 )
 
 func main() {
-	tracereporter.Start(time.Second*3, "mysql", "", func(span mocktracer.Span) string {
-		tags := span.Tags()
-		resoureName, ok := tags["resource.name"]
-		if !ok {
-			fmt.Println(span.OperationName(), tags)
-			return ""
-		}
-		return fmt.Sprint(resoureName)
-	})
+	tracereporter.Start(time.Second*3, "mysql", "", tracereporter.GetResourceNameFunc())
 
 	dsn := getDSN()
 	sqltrace.Register("mysql", &mysql.MySQLDriver{}, sqltrace.WithServiceName("mysql"))

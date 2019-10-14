@@ -7,7 +7,6 @@ import (
 	"github.com/rcrowley/go-metrics"
 	"github.com/yudppp/isutools/utils/measurereporter"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
-
 	"github.com/najeira/measure"
 )
 
@@ -56,4 +55,29 @@ func Start(duration time.Duration, serviceName, sortKey string, getKey func(span
 		measurereporter.Send(fmt.Sprintf("%s.csv", serviceName), result)
 		mt.Stop()
 	}()
+}
+
+// Report .
+func Report(duration time.Duration) []mocktracer.Span {
+	mt := mocktracer.Start()
+	time.Sleep(duration)
+	return mt.FinishedSpans()
+}
+
+// GetResourceNameFunc .
+func GetResourceNameFunc() func(span mocktracer.Span) string {
+	return GetKeyFronTagNameFunc("resource.name")
+
+}
+
+// GetKeyFronTagNameFunc .
+func GetKeyFronTagNameFunc(tagName string) func(span mocktracer.Span) string {
+	return func(span mocktracer.Span) string {
+		tags := span.Tags()
+		value, ok := tags[tagName]
+		if !ok {
+			return ""
+		}
+		return fmt.Sprint(value)
+	}
 }
