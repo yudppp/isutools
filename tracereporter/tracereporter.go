@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rcrowley/go-metrics"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 	"github.com/najeira/measure"
+	"github.com/rcrowley/go-metrics"
 	"github.com/yudppp/isutools/utils/measurereporter"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 )
 
 // Reporter .
@@ -31,7 +31,7 @@ func reportAll(reporters []Reporter, spans []mocktracer.Span) {
 	spansMap := make(map[string][]mocktracer.Span, len(reporters))
 	for _, v := range reporters {
 		spansMap[v.GetServiceName()] = make([]mocktracer.Span, 0)
-	} 
+	}
 	for _, span := range spans {
 		serviceName := getServiceName(span)
 		serviceSpans, ok := spansMap[serviceName]
@@ -55,7 +55,7 @@ func reportAll(reporters []Reporter, spans []mocktracer.Span) {
 // SimpleReport .
 type SimpleReport struct {
 	serviceName string
-	sortKey string
+	sortKey     string
 }
 
 // NewSimpleReport .
