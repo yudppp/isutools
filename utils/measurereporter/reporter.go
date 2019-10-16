@@ -1,8 +1,8 @@
 package measurereporter
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 
 	"github.com/najeira/measure"
 	"github.com/yudppp/isutools/utils/slackcat"
@@ -11,9 +11,9 @@ import (
 // Send .
 func Send(filename string, data measure.StatsSlice) error {
 	var b strings.Builder
-	fmt.Fprint(&b,`"Key","Count","Sum","Min","Max","Avg","Rate","P95"`)
+	fmt.Fprint(&b, `"Key","Count","Sum","Min","Max","Avg","Rate","P95"`)
 	for _, row := range data {
-		fmt.Fprintln(&b,"")
+		fmt.Fprintln(&b, "")
 		cols := []string{
 			row.Key,
 			fmt.Sprint(row.Count),

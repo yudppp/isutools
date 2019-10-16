@@ -13,7 +13,6 @@ pprofの結果をSlackに送る
 
 datadogのAPMの結果を出力するやつ
 
-
 ### utils/throttle
 
 _.throttle みたいなやつ
@@ -25,7 +24,6 @@ Slackcat wrapper
 
 ## TODO tools
 
-- access logger
 - slack log writter
 
 ## Setup
@@ -38,26 +36,14 @@ sudo chmod +x /usr/local/bin/slackcat
 slackcat --configure
 ```
 
-## sqlstr
-
-```
-go get github.com/najeira/measure
-go get github.com/tenntenn/isucontools/...
-cat main.go | sqlstr 
-```
-
-## mesuregen
-
-```
-go get github.com/tenntenn/isucontools
-cat main.go | go run $GOPATH/src/github.com/tenntenn/isucontools/cmd/measuregen/measuregen.go | pbcopy
-```
 
 ## dependency
 
 - https://github.com/tenntenn/isucontools
 - https://github.com/najeira/measure
 - http://slackcat.chat/
+- github.com/rcrowley/go-metrics
+- gopkg.in/DataDog/dd-trace-go.v1
 
 ## Links
 
