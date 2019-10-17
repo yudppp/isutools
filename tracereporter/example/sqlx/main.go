@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	tracereporter.Start(time.Second*3, tracereporter.NewSimpleReport("mysql", "Sum"))
+	tracereporter.Start(time.Second*3, tracereporter.NewSimpleReport(tracereporter.WithServiceName("mysql")))
 	dsn := getDSN()
 	sqltrace.Register("mysql", &mysql.MySQLDriver{}, sqltrace.WithServiceName("mysql"))
 	dbx, err := sqlx.Open("mysql", dsn)

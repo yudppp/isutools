@@ -42,8 +42,8 @@ slackcat --configure
 - https://github.com/tenntenn/isucontools
 - https://github.com/najeira/measure
 - http://slackcat.chat/
-- github.com/rcrowley/go-metrics
-- gopkg.in/DataDog/dd-trace-go.v1
+- http://github.com/rcrowley/go-metrics
+- http://gopkg.in/DataDog/dd-trace-go.v1
 
 ## Links
 

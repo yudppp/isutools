@@ -10,9 +10,11 @@ import (
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 )
 
+const allServiceName = "all"
+
 // Reporter .
 type Reporter interface {
-	GetServiceName() string
+	GetConfig() *Config
 	Report([]mocktracer.Span)
 }
 
@@ -28,25 +30,17 @@ func Start(duration time.Duration, reporters ...Reporter) {
 }
 
 func reportAll(reporters []Reporter, spans []mocktracer.Span) {
-	spansMap := make(map[string][]mocktracer.Span, len(reporters))
-	for _, v := range reporters {
-		spansMap[v.GetServiceName()] = make([]mocktracer.Span, 0)
-	}
-	for _, span := range spans {
-		serviceName := getServiceName(span)
-		serviceSpans, ok := spansMap[serviceName]
-		if !ok {
-			fmt.Printf("Unknow service.name: %s\n", serviceName)
-			continue
-		}
-		spansMap[serviceName] = append(serviceSpans, span)
-	}
-
 	for _, reporter := range reporters {
-		serviceName := reporter.GetServiceName()
-		spans, ok := spansMap[serviceName]
-		if !ok {
-			continue
+		cfg := reporter.GetConfig()
+		filterdSpans := make([]mocktracer.Span, 0, len(spans))
+		for _, span := range spans {
+			if cfg.serviceName != "" {
+				serviceName := getServiceName(span)
+				if cfg.serviceName != serviceName {
+					continue
+				}
+			}
+			filterdSpans = append(filterdSpans, span)
 		}
 		reporter.Report(spans)
 	}
@@ -54,19 +48,22 @@ func reportAll(reporters []Reporter, spans []mocktracer.Span) {
 
 // SimpleReport .
 type SimpleReport struct {
-	serviceName string
-	sortKey     string
+	*Config
 }
 
 // NewSimpleReport .
-// sortKey is key | count | sum | min | max | avg | rate | p95
-func NewSimpleReport(serviceName, sortKey string) Reporter {
-	return &SimpleReport{serviceName: serviceName, sortKey: sortKey}
+func NewSimpleReport(opts ...Option) Reporter {
+	cfg := new(Config)
+	defaults(cfg)
+	for _, fn := range opts {
+		fn(cfg)
+	}
+	return &SimpleReport{cfg}
 }
 
-// GetServiceName is implement Reporter
-func (r *SimpleReport) GetServiceName() string {
-	return r.serviceName
+// GetConfig is implement Reporter
+func (r *SimpleReport) GetConfig() *Config {
+	return r.Config
 }
 
 // Report is implement Reporter
@@ -98,12 +95,8 @@ func (r *SimpleReport) Report(spans []mocktracer.Span) {
 		}
 		result = append(result, stats)
 	}
-	sortKey := r.sortKey
-	if sortKey == "" {
-		sortKey = measure.Sum
-	}
-	result.SortDesc(sortKey)
-	measurereporter.Send(fmt.Sprintf("%s.csv", r.GetServiceName()), result)
+	result.SortDesc(r.sortKey)
+	measurereporter.Send(fmt.Sprintf("%s.csv", r.serviceName), result)
 }
 
 // getServiceName .

@@ -20,7 +20,7 @@ func main() {
 }
     
 func postInitialize(w http.ResponseWriter, r *http.Request) {
-    tracereporter.Start(benchTime, tracereporter.NewSimpleReport("mysql", ""))
+    tracereporter.Start(benchTime, tracereporter.NewSimpleReport(tracereporter.WithServiceName("mysql")))
 	// ...
 }
 ```
