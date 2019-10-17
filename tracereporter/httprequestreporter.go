@@ -70,9 +70,7 @@ func (r *httpRequestRepoter) Report(spans []mocktracer.Span) {
 
 	parentMetrics := loadMesure(httpRequestSpans)
 	var b strings.Builder
-	remainCount := len(parentMetrics)
 	for resourceName, parentMetric := range parentMetrics {
-		remainCount--
 		parentCount :=  parentMetric.Count()
 		fmt.Fprintf(&b, "%s (Count=%v,Avg=%.2f[ms],Sum=%.2f[ms])\n", resourceName, parentCount, parentMetric.Mean() / float64(time.Millisecond), float64(parentMetric.Sum()) / float64(time.Millisecond))
 		childSpans, ok := childSpansMap[resourceName]
@@ -85,9 +83,6 @@ func (r *httpRequestRepoter) Report(spans []mocktracer.Span) {
 			count := float64(metrics.Count()) / float64(parentCount)
 			avg := metrics.Mean() / float64(time.Millisecond) * count
 			fmt.Fprintf(&b, "- %s (Count=%.2f[/req],Avg=%.2f[ms/req])\n", resourceName, count, avg)
-		}
-		if remainCount != 0 {
-			fmt.Fprintf(&b, "")
 		}
 	}
 	slackcat.SendText("http.request.txt", b.String())
