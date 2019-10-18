@@ -2,8 +2,8 @@ package tracereporter
 
 import (
 	"fmt"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/rcrowley/go-metrics"
 	"github.com/yudppp/isutools/utils/slackcat"
@@ -34,7 +34,7 @@ func (r *httpRequestRepoter) GetConfig() *Config {
 
 // Report is implement Reporter
 func (r *httpRequestRepoter) Report(spans []mocktracer.Span) {
-	httpRequestSpans := make([]mocktracer.Span, 0,len(spans))
+	httpRequestSpans := make([]mocktracer.Span, 0, len(spans))
 	httpRequestMap := make(map[uint64]string, len(spans))
 	for _, span := range spans {
 		if span.OperationName() != HTTPReuestOperationName {
@@ -62,7 +62,6 @@ func (r *httpRequestRepoter) Report(spans []mocktracer.Span) {
 		}
 	}
 
-
 	if len(httpRequestSpans) == 0 {
 		slackcat.SendText("http.request.txt", "empty")
 		return
@@ -71,8 +70,8 @@ func (r *httpRequestRepoter) Report(spans []mocktracer.Span) {
 	parentMetrics := loadMesure(httpRequestSpans)
 	var b strings.Builder
 	for resourceName, parentMetric := range parentMetrics {
-		parentCount :=  parentMetric.Count()
-		fmt.Fprintf(&b, "%s (Count=%v,Avg=%.2f[ms],Sum=%.2f[ms])\n", resourceName, parentCount, parentMetric.Mean() / float64(time.Millisecond), float64(parentMetric.Sum()) / float64(time.Millisecond))
+		parentCount := parentMetric.Count()
+		fmt.Fprintf(&b, "%s (Count=%v,Avg=%.2f[ms],Sum=%.2f[ms])\n", resourceName, parentCount, parentMetric.Mean()/float64(time.Millisecond), float64(parentMetric.Sum())/float64(time.Millisecond))
 		childSpans, ok := childSpansMap[resourceName]
 		if !ok {
 			fmt.Fprintf(&b, "")
@@ -84,6 +83,7 @@ func (r *httpRequestRepoter) Report(spans []mocktracer.Span) {
 			avg := metrics.Mean() / float64(time.Millisecond) * count
 			fmt.Fprintf(&b, "- %s (Count=%.2f[/req],Avg=%.2f[ms/req])\n", resourceName, count, avg)
 		}
+		fmt.Fprintf(&b, "")
 	}
 	slackcat.SendText("http.request.txt", b.String())
 }
