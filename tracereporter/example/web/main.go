@@ -26,7 +26,7 @@ var dbx *sqlx.DB
 func main() {
 	var err error
 	dsn := getDSN()
-	sqltrace.Register("mysql", &mysql.MySQLDriver{}, sqltrace.WithServiceName("mysql"))
+	sqltrace.Register("mysql", &mysql.MySQLDriver{}, sqltrace.WithServiceName("mysql"), sqltrace.WithAnalytics(true))
 	dbx, err = sqlxtrace.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalf("failed to connect to DB: %s.", err.Error())
@@ -49,11 +49,13 @@ func hello(w http.ResponseWriter, r *http.Request) {
 
 func accessLoggeerSutpid() func(next http.Handler) http.Handler {
 	var urlReg = regexp.MustCompile(`([0-9]+)`)
+	tracer.Start(tracer.WithAnalytics(true))
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			opts := []ddtrace.StartSpanOption{
 				tracer.SpanType(ext.SpanTypeWeb),
 				tracer.ServiceName("router"),
+				tracer.Tag(ext.EventSampleRate, 1.0),
 			}
 			span, ctx := tracer.StartSpanFromContext(r.Context(), "http.request", opts...)
 			defer span.Finish()

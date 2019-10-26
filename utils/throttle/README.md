@@ -1,5 +1,7 @@
 # throttle
 
+copy github.com/yudppp/throttle
+
 throtting function called
 sync.Once like interface
 
