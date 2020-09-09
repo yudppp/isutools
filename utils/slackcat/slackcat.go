@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	// "bytes"
 	"os/exec"
 )
 
@@ -19,14 +18,22 @@ func SendFile(filePath, pattern string) error {
 	ext := path.Ext(pattern)
 	names := strings.Split(pattern, ".")
 	outputName := fmt.Sprintf("%s-%s%s", names[0], time.Now().Format("200601021504"), ext)
-	fmt.Println("slackcat", "--channel", defaultChannel, tokenOption, "-n", outputName, filePath)
-	return exec.Command("slackcat", "--channel", defaultChannel, tokenOption, "-n", outputName, filePath).Run()
+	if tokenOption == "" {
+		return exec.Command("slackcat", "--channel", defaultChannel, "-n", outputName, filePath).Run()
+	}
+	return exec.Command("slackcat", "--channel", defaultChannel, "--token", tokenOption, "-n", outputName, filePath).Run()
 }
 
 // SendText .
 func SendText(filename, text string) error {
 	c1 := exec.Command("echo", text)
-	c2 := exec.Command("slackcat", "--channel", defaultChannel, tokenOption, "--filename", filename)
+	var command2Options []string
+	if tokenOption == "" {
+		command2Options = []string{"--channel", defaultChannel, "--token", tokenOption, "--filename", filename}
+	} else {
+		command2Options = []string{"--channel", defaultChannel, "--filename", filename}
+	}
+	c2 := exec.Command("slackcat", command2Options...)
 
 	r, w := io.Pipe()
 	c1.Stdout = w
@@ -49,5 +56,5 @@ func SetToken(token string) {
 	if token == "" {
 		tokenOption = ""
 	}
-	tokenOption = fmt.Sprintf("--token %s", token)
+	tokenOption = token
 }
