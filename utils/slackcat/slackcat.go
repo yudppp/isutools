@@ -3,6 +3,7 @@ package slackcat
 import (
 	"fmt"
 	"io"
+	"os"
 	"path"
 	"strings"
 	"time"
@@ -18,10 +19,13 @@ func SendFile(filePath, pattern string) error {
 	ext := path.Ext(pattern)
 	names := strings.Split(pattern, ".")
 	outputName := fmt.Sprintf("%s-%s%s", names[0], time.Now().Format("200601021504"), ext)
+	cmd := exec.Command("slackcat", "--channel", defaultChannel, "--token", tokenOption, "-n", outputName, filePath)
 	if tokenOption == "" {
 		return exec.Command("slackcat", "--channel", defaultChannel, "-n", outputName, filePath).Run()
 	}
-	return exec.Command("slackcat", "--channel", defaultChannel, "--token", tokenOption, "-n", outputName, filePath).Run()
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	return cmd.Run()
 }
 
 // SendText .

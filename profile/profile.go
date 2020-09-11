@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -34,22 +35,16 @@ func StartCPU(duration time.Duration, imageOnly bool) error {
 		return err
 	}
 	timerStop := func() {
-		time.Sleep(duration)
 		pprof.StopCPUProfile()
 		f.Close()
 
-		// image format
-		if true {
-			imageFile := "pprof.png"
-			exec.Command("go", "tool", "pprof", "-png", "-output", imageFile, f.Name()).Run()
-			slackcat.SendFile(imageFile, "pprof.png")
-			os.Remove(imageFile)
-		} else {
-			imageFile := "pprof.svg"
-			exec.Command("go", "tool", "pprof", "-svg", "-output", imageFile, f.Name()).Run()
-			slackcat.SendFile(imageFile, "pprof.svg")
-			os.Remove(imageFile)
-		}
+		imageFile := "pprof.png"
+		cmd := exec.Command("go", "tool", "pprof", "-png", "-output", imageFile, f.Name())
+		cmd.Stdout = os.Stdout
+		cmd.Stdin = os.Stdin
+		cmd.Run()
+		err := slackcat.SendFile(imageFile, "pprof.png")
+		fmt.Println(err)
 
 		if !imageOnly {
 			slackcat.SendFile(f.Name(), "cpu.pprof")
